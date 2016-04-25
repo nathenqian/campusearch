@@ -1,0 +1,54 @@
+from json import dumps
+from threading import Lock
+
+g_uid = 0
+g_uid2url = {}
+g_url2uid = {}
+g_uid_mutex = Lock()
+
+
+class Url:
+    def __init__(self):
+        self.content = ""
+        self.url = ""
+        self.uid = -1
+        self.parse = []
+        self.status = ""
+
+    def toDict(self):
+        return {
+            "content" : self.content,
+            "url" : self.url,
+            "uid" : self.uid,
+            "parse" : self.parse,
+            "status" : self.status
+        }
+
+    def toJson(self):
+        return dumps(self.toDict())
+
+    def parseDict(self, dic):
+        self.content = dic["content"]
+        self.url = dic["url"]
+        self.uid = dic["uid"]
+        self.parse = dic["parse"]
+        self.status = dic["status"]
+        return self
+
+    @classmethod
+    def create(cls, url, content, parse, status):
+        g_uid_mutex.acquire()
+        uid = g_uid
+        g_uid += 1
+        g_uid_mutex.release()
+        url = Url().parseDict({
+            "content" : content,
+            "url" : url,
+            "uid" : uid,
+            "parse" : parse,
+            "status" : self.status
+        })
+        g_uid2url[uid] = url
+        g_url2uid[url] = uid
+        return url
+
