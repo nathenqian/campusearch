@@ -5,7 +5,7 @@ from .logger import Logger
 
 class GreenDownloader():
     def __init__(self, proxy, thread_number):
-        self.pool = eventlet.GreenPool()
+        self.pool = eventlet.GreenPool(thread_number)
         self.input_queue = eventlet.Queue()
         self.output_queue = eventlet.Queue()
         self.proxy = proxy
@@ -58,6 +58,7 @@ class GreenDownloader():
             self.pool.spawn_n(self.get_data, obj)
             # print self.pool.running()
             dispatch = True
-        print self.pool.running()
+        # print self.pool.running()
+        eventlet.sleep()
         return dispatch
 
