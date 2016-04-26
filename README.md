@@ -2,4 +2,4 @@
 
 ## Requirement
 
-Python package: *eventlet*, *BeautifulSoup*
+Python package: *eventlet*, *bs4*
