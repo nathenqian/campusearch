@@ -16,7 +16,7 @@ class FileManager:
             with open(join(self.file_dir, "gid_url.txt")) as f:
                 buff_dict = loads(f.read())
                 for i in buff_dict:
-                    g_uid = max(g_uid, i)
+                    g_uid = max(g_uid, int(i))
                     g_uid2url[i] = buff_dict[i]
                     g_url2uid[buff_dict[i]] = i
             print "load gid success"

@@ -41,6 +41,6 @@ def extract_urls(url, html):
     for a in soup.findAll('a'):
         l = a.get('href')
         if l is not None:
-            print l
+            # print l
             url_lst.append(l)
     return _filter(url, url_lst)

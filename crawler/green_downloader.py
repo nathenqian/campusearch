@@ -10,6 +10,7 @@ class GreenDownloader():
         self.output_queue = eventlet.Queue()
         self.proxy = proxy
         self.logger = Logger.create("log")
+        self.timeout = 1
 
 
     def get_data(self, argv):
@@ -20,7 +21,7 @@ class GreenDownloader():
         try:
             url = argv["url"]
             try:
-                with eventlet.Timeout(1, False):
+                with eventlet.Timeout(self.timeout, False):
                     headers = {
                         "User-Agent":"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1"
                     }

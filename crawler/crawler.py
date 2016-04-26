@@ -5,7 +5,7 @@ from time import sleep, time
 from .logger import Logger
 from .green_downloader import GreenDownloader
 from .file_manager import FileManager
-from .url_extractor import extract_urls, guess_encode
+from .url_extractor import extract_urls
 from eventlet import monkey_patch, GreenPool
 from select import select
 from sys import stdin
@@ -72,6 +72,7 @@ class Crawler:
             while not self.downloader.output_queue.empty():
                 obj = self.downloader.output_queue.get()
                 url = obj["url"]
+                self.doing_url -= 1
                 if url in g_url2uid:
                     continue
                 finish_task_cnt += 1
@@ -82,7 +83,7 @@ class Crawler:
                     # obj["content"] = decode_content
                     url = Url.create(url, obj["content"], {}, "DONE")
                     # todo parse url and add new url
-                    new_url = extract_urls(url.content)
+                    new_url = extract_urls(url.url, url.content)
                     for i in new_url:
                         self.todo_url.append(i)
                     # else:
@@ -91,7 +92,6 @@ class Crawler:
                 else:
                     # error
                     url = Url.create(url, None, {}, "ERROR")
-                self.doing_url -= 1
                 # self.logger.debug(url.url + ' ' + url.status + ' ' + url.content)
                 self.save_list.append(url)
             # print "todo = " + str(len(self.todo_url))
@@ -101,6 +101,7 @@ class Crawler:
                 self.logger.debug("save " + str(len(self.save_list)) + " file ")
                 self.logger.debug("last " + str(time() - start_time) + " second ")
                 self.logger.debug("last interval finish " + str(finish_task_cnt)  + " task")
+                self.logger.debug("running = " + str(self.doing_url) + " " + str(self.downloader.pool.running()))
                 finish_task_cnt = 0
                 next_save_time += self.save_interval
                 for i in self.save_list:
