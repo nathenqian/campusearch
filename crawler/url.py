@@ -12,20 +12,19 @@ class Url:
         self.content = ""
         self.url = ""
         self.uid = -1
-        self.parse = []
+        self.parse = {}
         self.status = ""
 
-    def toDict(self):
+    def toDictWithoutContent(self):
         return {
-            "content" : self.content,
             "url" : self.url,
             "uid" : self.uid,
             "parse" : self.parse,
             "status" : self.status
         }
 
-    def toJson(self):
-        return dumps(self.toDict())
+    def toJsonWithoutContent(self):
+        return dumps(self.toDictWithoutContent(), indent = 4)
 
     def parseDict(self, dic):
         self.content = dic["content"]
@@ -37,18 +36,20 @@ class Url:
 
     @classmethod
     def create(cls, url, content, parse, status):
+        global g_uid, g_uid_mutex, g_uid2url, g_url2uid
         g_uid_mutex.acquire()
         uid = g_uid
         g_uid += 1
         g_uid_mutex.release()
-        url = Url().parseDict({
+
+        url_ = Url().parseDict({
             "content" : content,
             "url" : url,
             "uid" : uid,
             "parse" : parse,
-            "status" : self.status
+            "status" : status
         })
         g_uid2url[uid] = url
         g_url2uid[url] = uid
-        return url
+        return url_
 

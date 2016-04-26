@@ -16,7 +16,7 @@ class GreenDownloader():
         # argv = {"urls" : [], "worker" : , }
         content = None
         error_code = None
-        self.logger.debug("start fetch")
+        self.logger.debug("start fetch " + argv["url"])
         try:
             url = argv["url"]
             try:
