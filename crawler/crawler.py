@@ -86,7 +86,8 @@ class Crawler:
                     if is_save_url(url.url) is None:
                         new_url = extract_urls(url.url, url.content)
                         for i in new_url:
-                            self.todo_url.append(i)
+                            if i not in g_url2uid:
+                                self.todo_url.append(i)
                     # else:
                         # can't guess decode
                         # url = Url.create(url, None, {}, "ERROR")
