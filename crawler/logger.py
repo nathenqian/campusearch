@@ -1,5 +1,6 @@
 from logging import getLogger, DEBUG, Formatter, basicConfig, FileHandler, Formatter, StreamHandler
 logger_map = {}
+
 class Logger:
     @classmethod
     def create(cls, name):
