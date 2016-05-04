@@ -5,7 +5,7 @@ from time import sleep, time
 from .logger import Logger
 from .green_downloader import GreenDownloader
 from .file_manager import FileManager
-from .url_extractor import extract_urls
+from .url_extractor import extract_urls, is_save_url
 from eventlet import monkey_patch, GreenPool
 from select import select
 from sys import stdin
@@ -83,9 +83,10 @@ class Crawler:
                     # obj["content"] = decode_content
                     url = Url.create(url, obj["content"], {}, "DONE")
                     # todo parse url and add new url
-                    new_url = extract_urls(url.url, url.content)
-                    for i in new_url:
-                        self.todo_url.append(i)
+                    if is_save_url(url.url) is None:
+                        new_url = extract_urls(url.url, url.content)
+                        for i in new_url:
+                            self.todo_url.append(i)
                     # else:
                         # can't guess decode
                         # url = Url.create(url, None, {}, "ERROR")

@@ -46,3 +46,11 @@ def extract_urls(url, html):
             # print l
             url_lst.append(l)
     return _filter(url, url_lst)
+
+save_prefix = '.*(?i)\.(docx?|pptx?|xlsx?|pdf)'
+save_re = re.compile(save_prefix)
+def is_save_url(url):
+    prefix = save_re.search(url)
+    if prefix is None:
+        return None
+    return prefix.group(1)

@@ -1,4 +1,5 @@
 from .url import Url, g_uid, g_uid2url, g_url2uid
+from .url_extractor import is_save_url
 from json import dumps, loads
 from os import mkdir
 from os.path import exists, join
@@ -43,7 +44,10 @@ class FileManager:
         path = join(join(self.file_dir, folder), str(uid) + ".json")
         with open(path, "w") as f:
             f.write(url.toJsonWithoutContent())
-        path = join(join(self.file_dir, folder), str(uid) + ".html")
+        if is_save_url(url.url) is None:
+            path = join(join(self.file_dir, folder), str(uid) + ".html")
+        else:
+            path = join(join(self.file_dir, folder), str(uid) + "." + is_save_url(url.url))
         if url.content is not None:
             with open(path, "w") as f:
                 f.write(url.content)
