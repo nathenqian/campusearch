@@ -10,7 +10,7 @@ class GreenDownloader():
         self.output_queue = eventlet.Queue()
         self.proxy = proxy
         self.logger = Logger.create("log")
-        self.timeout = 1
+        self.timeout = 10
 
 
     def get_data(self, argv):
