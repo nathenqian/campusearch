@@ -17,6 +17,7 @@ validator = re.compile(
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
         r'(?::\d+)?' # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+thu = re.compile('.*(tsinghua\.edu\.cn|166.111|59.66|101.5|101.6|106.120.132|118.229|183.172|183.173|202.112|202.38|211.68).*')
 
 def _filter(orig_url, lst):
 
@@ -27,7 +28,7 @@ def _filter(orig_url, lst):
             url = urljoin(orig_url, url)
             if validator.search(url) is None:
                 return None
-        return url
+        return url if thu.search(url) is not None else None
 
     for f in filters:
        lst = [x for x in lst if f.search(x) is None]
