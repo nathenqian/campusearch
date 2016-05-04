@@ -25,6 +25,7 @@ class Crawler:
 
         self.file_manager = FileManager(self.file_dir)
         self.todo_url = []
+        self.todo_map = {}
         self.file_manager.init(self.todo_url)
 
         self.doing_url = 0
@@ -33,9 +34,15 @@ class Crawler:
         self.logger = Logger.create("log")
 
         self.save_list = []
+
         # monkey_patch()
         # print g_uid
         self.run()
+
+    def append_todourl(self, url):
+        if url not in self.todo_map:
+            self.todo_url.append(url)
+            self.todo_map[url] = True
 
 
     def run(self):
@@ -51,7 +58,8 @@ class Crawler:
                     index = 1
                     while stdin_input[index] == ' ':
                         index += 1
-                    self.todo_url.append(stdin_input[index:])
+                    self.append_todourl(stdin_input[index:])
+                    # self.todo_url.append(stdin_input[index:])
 
             #dispatch
             while self.doing_url < self.thread_number:
@@ -87,7 +95,8 @@ class Crawler:
                         new_url = extract_urls(url.url, url.content)
                         for i in new_url:
                             if i not in g_url2uid:
-                                self.todo_url.append(i)
+                                self.append_todourl(i)
+                                # self.todo_url.append(i)
                     # else:
                         # can't guess decode
                         # url = Url.create(url, None, {}, "ERROR")
