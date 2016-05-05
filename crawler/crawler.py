@@ -1,14 +1,17 @@
-from .url import Url, g_uid, g_uid2url, g_url2uid
 from json import loads
 from threading import Thread
 from time import sleep, time
+from eventlet import monkey_patch, GreenPool
+from eventlet import sleep as esleep
+from select import select
+from sys import stdin
+
+from .url import Url, g_init, get_url2uid, get_uid2url
 from .logger import Logger
 from .green_downloader import GreenDownloader
 from .file_manager import FileManager
 from .url_extractor import extract_urls, is_save_url
-from eventlet import monkey_patch, GreenPool
-from select import select
-from sys import stdin
+
 
 
 class Crawler:
@@ -21,12 +24,14 @@ class Crawler:
         init gid -> url
         init unfinished queue 
         """
-
-
         self.file_manager = FileManager(self.file_dir)
         self.todo_url = []
-        self.todo_map = {}
-        self.file_manager.init(self.todo_url)
+
+        (uid, uid2url, url2uid) = self.file_manager.init(self.todo_url)
+        print "init already finish %d webs" % (len(uid2url))
+        g_init(uid, uid2url, url2uid)
+
+        self.todo_map = {x : True for x in self.todo_url}
 
         self.doing_url = 0
         self.downloader = GreenDownloader(None, self.thread_number)
@@ -60,6 +65,16 @@ class Crawler:
                         index += 1
                     self.append_todourl(stdin_input[index:])
                     # self.todo_url.append(stdin_input[index:])
+                elif stdin_input[:4] == "exit":
+                    while self.downloader.pool.running() != 0:
+                        print "still have %d jobs pls wait" % (self.downloader.pool.running())
+                        esleep()
+                        sleep(1)
+                    for i in self.save_list:
+                        self.file_manager.save_url(i)
+                    self.file_manager.save_global(get_uid2url())
+                    self.file_manager.save_todo_list(self.todo_url)
+                    return
 
             #dispatch
             while self.doing_url < self.thread_number:
@@ -81,7 +96,7 @@ class Crawler:
                 obj = self.downloader.output_queue.get()
                 url = obj["url"]
                 self.doing_url -= 1
-                if url in g_url2uid:
+                if url in get_url2uid():
                     continue
                 finish_task_cnt += 1
                 if "error_code" not in obj and obj["content"] is not None:
@@ -94,7 +109,7 @@ class Crawler:
                     if is_save_url(url.url) is None:
                         new_url = extract_urls(url.url, url.content)
                         for i in new_url:
-                            if i not in g_url2uid:
+                            if i not in get_url2uid():
                                 self.append_todourl(i)
                                 # self.todo_url.append(i)
                     # else:
@@ -117,7 +132,7 @@ class Crawler:
                 next_save_time += self.save_interval
                 for i in self.save_list:
                     self.file_manager.save_url(i)
-                self.file_manager.save_global()
+                self.file_manager.save_global(get_uid2url())
                 self.file_manager.save_todo_list(self.todo_url)
                 self.save_list = []
 
@@ -127,4 +142,4 @@ class Crawler:
         #     print str(e)
 
 
-    
+

@@ -6,6 +6,19 @@ g_uid2url = {}
 g_url2uid = {}
 g_uid_mutex = Lock()
 
+def get_uid2url():
+    return g_uid2url
+
+def get_url2uid():
+    return g_url2uid
+
+
+def g_init(uid, uid2url, url2uid):
+    global g_uid, g_uid2url, g_url2uid
+    g_uid = uid
+    g_uid2url = uid2url
+    g_url2uid = url2uid
+
 
 class Url:
     def __init__(self):
